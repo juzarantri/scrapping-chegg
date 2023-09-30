@@ -50,7 +50,7 @@ async function playTest(url) {
     );
     let value = await page.evaluate((el) => el.textContent, element);
 
-    if (value.indexOf("Hello, Expert!") == 0) {
+    if (value.indexOf("Hello, Expert!") == -1) {
       await page.screenshot({ path: `chegg.png` });
 
       client.messages
