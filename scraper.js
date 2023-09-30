@@ -37,30 +37,36 @@ async function playTest(url) {
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const client = require("twilio")(accountSid, authToken);
   setInterval(async () => {
-    await page.goto("https://expert.chegg.com/qna/authoring/answer");
-    console.log(await page.url());
-    await page.waitForSelector("#__next > main > div > div");
+    try {
+      await page.goto("https://expert.chegg.com/qna/authoring/answer");
+      console.log(await page.url());
+      await page.waitForSelector("#__next > main > div > div");
 
-    await page.waitForSelector(
-      "#__next > main > div > div > div.sc-iFoMEM.hQihfE"
-    );
+      await page.waitForSelector(
+        "#__next > main > div > div > div.sc-eGugkK.kyqJVO > div.lmxvvx-0.jdGVAK > div"
+      );
 
-    let element = await page.$(
-      "#__next > main > div > div > div.sc-iFoMEM.hQihfE"
-    );
-    let value = await page.evaluate((el) => el.textContent, element);
+      let element = await page.$(
+        "#__next > main > div > div > div.sc-eGugkK.kyqJVO > div.lmxvvx-0.jdGVAK > div"
+      );
+      let value = await page.evaluate((el) => el.textContent, element);
 
-    if (value.indexOf("Hello, Expert!") == -1) {
-      await page.screenshot({ path: `chegg.png` });
+      console.log(value);
 
-      client.messages
-        .create({
-          body: "Question",
-          from: "whatsapp:+14155238886",
-          to: `whatsapp:${process.env.MOB_NO}`,
-          mediaUrl: process.env.MEDIA_URL,
-        })
-        .then((message) => console.log(message.sid));
+      if (value.indexOf("Hello, Expert!") == -1) {
+        await page.screenshot({ path: `chegg.png` });
+
+        client.messages
+          .create({
+            body: "Question",
+            from: "whatsapp:+14155238886",
+            to: `whatsapp:${process.env.MOB_NO}`,
+            mediaUrl: process.env.MEDIA_URL,
+          })
+          .then((message) => console.log(message.sid));
+      }
+    } catch (e) {
+      console.log("Error while processing", e);
     }
   }, 1000 * 60);
 
@@ -69,3 +75,5 @@ async function playTest(url) {
 }
 
 module.exports = { playTest };
+
+// playTest("https://expert.chegg.com/auth/login");
